@@ -1,0 +1,28 @@
+#!/usr/bin/env perl6
+use v6;
+#use LWP::Simple;
+#use IO::Socket::SSL; Digest broken
+use Net::Curl::Easy; 
+
+sub MAIN (Str $module) { 
+    my @lines = qqx!panda info $module!.split("\n"); # XXX
+    my $found = @lines.grep(/'Source-url'/).list.join;
+
+    $found=$found.split("github.com").list.[1].subst(".git","");
+
+    $found = "https://raw.githubusercontent.com{$found}/master/README";
+
+    my @urls = $found X~ (".md", "", ".txt",".pod");
+
+    my $md;
+    for @urls -> $url {
+
+        $md = Net::Curl::Easy.new(:$url).download;
+
+        last if $md !~~ "Not Found"
+
+
+    };
+
+    $md.say;
+}
