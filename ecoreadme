@@ -3,7 +3,7 @@
 use v6;
 #use LWP::Simple;
 #use IO::Socket::SSL; # XXX Digest broken 20151005
-use Net::Curl::Easy; # XXX
+use Net::Curl::Easy; 
 use Panda;
 use Panda::Ecosystem;
 use Panda::App;
