@@ -16,10 +16,12 @@ mkdir CACHE-DIR unless CACHE-DIR.IO.d;
 
 my @prefixes = (".md", "", ".txt",".pod");
 
-sub MAIN (Str $module) { 
+sub MAIN (Str $module, Bool :$get = False) { 
 
     # :: invalid on windows
     my $cache = CACHE-DIR ~ $module.subst("::","_",:g);
+
+    unlink $cache if $get;
 
     if $cache.IO.e {
         DEBUG and warn "cache hit";
