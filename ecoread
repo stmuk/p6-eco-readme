@@ -1,11 +1,21 @@
 #!/usr/bin/env perl6
 use v6;
 #use LWP::Simple;
-#use IO::Socket::SSL; Digest broken
-use Net::Curl::Easy; 
+#use IO::Socket::SSL; # XXX Digest broken 20151005
+use Net::Curl::Easy; # XXX
 
-sub MAIN (Str $module) { 
-    my @lines = qqx!panda info $module!.split("\n"); # XXX
+use Panda;
+use Panda::Ecosystem;
+use Panda::App;
+use IO::Capture::Simple;
+
+sub MAIN (*@module) { 
+
+    my $panda = Panda.new(:ecosystem(make-default-ecosystem()));
+    
+    # XXX capture STDOUT but better to have an accessible API
+    my @lines = (capture_stdout { projectinfo($panda, @module) }).split("\n");
+
     my $found = @lines.grep(/'Source-url'/).list.join;
 
     $found=$found.split("github.com").list.[1].subst(".git","");
