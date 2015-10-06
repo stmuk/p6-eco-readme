@@ -36,8 +36,7 @@ sub MAIN (Str $module, Bool :$get = False) {
 
     my $found = @lines.grep(/'Source-url'/).list.join;
 
-    $found=$found.split("github.com").list.[1].subst(".git","");
-
+    $found = $found.split("github.com").list.[1].subst(".git","");
     $found = "https://raw.githubusercontent.com{$found}/master/README";
 
     my @urls = $found X~ @prefixes;
