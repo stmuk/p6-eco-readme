@@ -2,7 +2,7 @@
     "name"        : "App::ecoreadme",
     "version"     : "0.1",
     "description" : "Display and cache ecosystem README files for perl6",
-    "depends"     : ["File::Find"],
+    "depends"     : ["Net::Curl","Panda","IO::Capture::Simple"],
     "provides"    : {
             "App::ecoreadme": "lib/App/ecoreadme"
     },
