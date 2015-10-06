@@ -1,20 +1,36 @@
 #!/usr/bin/env perl6
+#
 use v6;
 #use LWP::Simple;
 #use IO::Socket::SSL; # XXX Digest broken 20151005
 use Net::Curl::Easy; # XXX
-
 use Panda;
 use Panda::Ecosystem;
 use Panda::App;
 use IO::Capture::Simple;
 
-sub MAIN (*@module) { 
+constant DEBUG = %*ENV<DEBUG>;
+constant CACHE-DIR = %*ENV<HOME> ~ '/.p6-eco-readme/';
+
+mkdir CACHE-DIR unless CACHE-DIR.IO.d;
+
+my @prefixes = (".md", "", ".txt",".pod");
+
+sub MAIN (Str $module) { 
+
+    # :: invalid on windows
+    my $cache = CACHE-DIR ~ $module.subst("::","_",:g);
+
+    if $cache.IO.e {
+        DEBUG and warn "cache hit";
+        $cache.IO.slurp.say;
+        exit;
+    }
 
     my $panda = Panda.new(:ecosystem(make-default-ecosystem()));
-    
+
     # XXX capture STDOUT but better to have an accessible API
-    my @lines = (capture_stdout { projectinfo($panda, @module) }).split("\n");
+    my @lines = (capture_stdout { projectinfo($panda, [$module]) }).split("\n");
 
     my $found = @lines.grep(/'Source-url'/).list.join;
 
@@ -22,7 +38,7 @@ sub MAIN (*@module) {
 
     $found = "https://raw.githubusercontent.com{$found}/master/README";
 
-    my @urls = $found X~ (".md", "", ".txt",".pod");
+    my @urls = $found X~ @prefixes;
 
     my $md;
     for @urls -> $url {
@@ -33,6 +49,8 @@ sub MAIN (*@module) {
 
 
     };
+
+    spurt($cache, $md);
 
     $md.say;
 }
